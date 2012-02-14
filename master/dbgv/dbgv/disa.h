@@ -8,37 +8,37 @@
 LPVOID NTAPI MemoryMapping
 	(__in HANDLE hFile) {
 
-		HANDLE hFileMapp = CreateFileMapping(hFile, NULL,  PAGE_READONLY | SEC_IMAGE,
+	HANDLE hFileMapp = CreateFileMapping(hFile, NULL,  PAGE_READONLY | SEC_IMAGE,
 								             0, 0, NULL);
         if (hFileMapp == NULL) {
             printf("ERROR: CreateFileMapping failed  with code: %d\n", GetLastError());
             return FALSE; }
 
-       LPVOID ImageBase = MapViewOfFile(hFileMapp, FILE_MAP_READ,
-							            0, 0, NULL);
-	   return ImageBase;
+        LPVOID ImageBase = MapViewOfFile(hFileMapp, FILE_MAP_READ,
+					 0, 0, NULL);
+	return ImageBase;
 }
 
 PBYTE NTAPI GetPEInfo
 	(__in HANDLE hFile,
 	 __in LPVOID ImageBase) {
 
-		 mz = (IMAGE_DOS_HEADER *) ImageBase;
+	     mz = (IMAGE_DOS_HEADER *) ImageBase;
 	     if (mz->e_magic != IMAGE_DOS_SIGNATURE) {   
 		   VirtualFree(mz, 0, MEM_FREE);
 		   printf("DISASM ERROR: The file is not an exe for windows.\n");
-           return NULL; }
+                   return NULL; }
 
-         pe = (IMAGE_NT_HEADERS *)(mz->e_lfanew + (long) mz);
-         if (pe->Signature != IMAGE_NT_SIGNATURE) {
-           VirtualFree(mz, 0, MEM_FREE);
-           printf("DISASM ERROR: The file is not an exe for windows.\n");
-           return NULL; }
+             pe = (IMAGE_NT_HEADERS *)(mz->e_lfanew + (long) mz);
+             if (pe->Signature != IMAGE_NT_SIGNATURE) {
+                 VirtualFree(mz, 0, MEM_FREE);
+                 printf("DISASM ERROR: The file is not an exe for windows.\n");
+                 return NULL; }
 
 	     DWORD ep = pe->OptionalHeader.AddressOfEntryPoint; 
 	     buf = (unsigned char*) ImageBase;
 	     PBYTE first = (BYTE*)((long)ImageBase + ep); 
-		 return first;
+	     return first;
 }
 
 PBYTE  disasmMov
@@ -53,27 +53,27 @@ PBYTE  disasmMovImm32
 
 PBYTE  disasmJumpRel
 	(__in struct _INSTRUCTION_TABLE* pInsTab,               
-     __in PBYTE pb_from,
+         __in PBYTE pb_from,
 	 __in BOOL stepIn);
 
 PBYTE  disasmCall
 	(__in struct _INSTRUCTION_TABLE* pInsTab,               
-     __in PBYTE pb_from,
+         __in PBYTE pb_from,
 	 __in BOOL stepIn);
 
 PBYTE  disasmPush
 	(__in struct _INSTRUCTION_TABLE* pInsTab,               
-     __in PBYTE pb_from,
+         __in PBYTE pb_from,
 	 __in BOOL stepIn);
 
 PBYTE  disasmPush
 	(__in struct _INSTRUCTION_TABLE* pInsTab,               
-     __in PBYTE pb_from,
+         __in PBYTE pb_from,
 	 __in BOOL stepIn);
 
 PBYTE  prefixR
 	(__in struct _INSTRUCTION_TABLE* pInsTab,               
-     __in PBYTE pb_from,
+         __in PBYTE pb_from,
 	 __in BOOL stepIn);
 
 PBYTE disasm 
@@ -128,15 +128,15 @@ PBYTE  disasmMov
 	 __in BOOL stepIn) {  
 
 		           BOOL flagImm = FALSE, flagModRm = FALSE, flagSIB = FALSE;
-                   BYTE rmValue, regValue, b_modrm, b_imm, b_disp;
-				   DWORD dw_disp;
-                   char *regMod;
+                           BYTE rmValue, regValue, b_modrm, b_imm, b_disp;
+			   DWORD dw_disp;
+                           char *regMod;
 				   	 
-				   printf("Opcode %x\n", pInsTab->opcode);
-		           printf("Address: %08x    ", pb_from);
-                   opsize_override = FALSE;
-				   addsize_override = FALSE;
-				  //se indirizza in memoria, controllo l'addsize override prefix, se è attivo allora userò la
+				  printf("Opcode %x\n", pInsTab->opcode);
+		                  printf("Address: %08x    ", pb_from);
+                                  opsize_override = FALSE;
+				  addsize_override = FALSE;
+				  //se indirizza in memoria, controllo l'addsize override prefix, se ï¿½ attivo allora userï¿½ la
 				  //lunghezza dell'opcode in 16bit mode, altrimenti quella con 32
 				  LONG target_length = (pInsTab->flag & FUNC_ADD)
 					  ?(addsize_override ? pInsTab->opcode_size16 : pInsTab->opcode_size32) 
@@ -149,7 +149,7 @@ PBYTE  disasmMov
 				  printf("%02x  ", pb_from[pInsTab->modrm]);
 				  target_length += b_flag & NO_SIB; // aggiungo il sib se presente
 				  if (b_flag & SIB_PRESENT) {
-                      BYTE b_sib = pb_from[pInsTab->modrm + 1];
+                                          BYTE b_sib = pb_from[pInsTab->modrm + 1];
 							//printf("%x", pb_from[pInsTab->modrm + 1]);
 					  if ((b_sib & 0x07) == 0x05) { 
 					      if ((b_modrm & 0xc0) == 0x00) {   //primo quadrante tabella intel 
@@ -278,7 +278,7 @@ PBYTE  disasmCall
 			 if (stepIn == FALSE) return addr;
 			 else return (pb_from + target_length);
 		 }
-         if (*pb_from == 0xe9) {
+                 if (*pb_from == 0xe9) {
 			 printf("jmp %08x\n", addr);
 			 return (addr + target_length);
 		 }
@@ -359,13 +359,13 @@ const INSTRUCTION_TABLE deco[256] = {
 
 	{ 0x0E, oneByte_MACRO, "push cs"}, { 0x0F, oneByte_MACRO, "pop"}, //PUSH CS, POP FS, GS
 
-    { 0x10, twoByteModrm_MACRO, "adc" }, { 0x11, twoByteModrm_MACRO, "adc" }, { 0x12, twoByteModrm_MACRO, "adc" }, { 0x13, twoByteModrm_MACRO, "adc" },
+        { 0x10, twoByteModrm_MACRO, "adc" }, { 0x11, twoByteModrm_MACRO, "adc" }, { 0x12, twoByteModrm_MACRO, "adc" }, { 0x13, twoByteModrm_MACRO, "adc" },
 	{ 0x14, twoByte_MACRO, "adc" },  { 0x15, trefiveByte_MACRO, "adc" }, //ADC no imm8/16
 
 	{ 0x16, oneByte_MACRO, "mov"}, { 0x17, oneByte_MACRO, "mov"}, //PUSH SS, POP SS
 
 	{ 0x18, twoByteModrm_MACRO, "mov" }, { 0x19, twoByteModrm_MACRO, "mov" }, { 0x1A, twoByteModrm_MACRO, "add" }, { 0x1B, twoByteModrm_MACRO, "add" },
-    { 0x1C, twoByte_MACRO, "add" }, { 0x1D, trefiveByte_MACRO, "add" }, //SBB no imm8/16
+        { 0x1C, twoByte_MACRO, "add" }, { 0x1D, trefiveByte_MACRO, "add" }, //SBB no imm8/16
 
 	{ 0x1E, oneByte_MACRO, "add"}, { 0x1F, oneByte_MACRO, "add"}, //PUSH DS, POP DS
 
@@ -376,12 +376,12 @@ const INSTRUCTION_TABLE deco[256] = {
 
 	{ 0x27, oneByte_MACRO, "add"}, //DAA (decimal adjust AL after addiction)
 
-    { 0x28, twoByteModrm_MACRO, "add" }, { 0x29, twoByteModrm_MACRO, "add" }, { 0x2A, twoByteModrm_MACRO, "add" }, { 0x2B, twoByteModrm_MACRO, "add" },
-	{ 0x2C, twoByte_MACRO, "add" }, { 0x2D, trefiveByte_MACRO, "add" }, //SUB no imm8/16/32
+        { 0x28, twoByteModrm_MACRO, "add" }, { 0x29, twoByteModrm_MACRO, "add" }, { 0x2A, twoByteModrm_MACRO, "add" }, { 0x2B, twoByteModrm_MACRO, "add" },
+   	{ 0x2C, twoByte_MACRO, "add" }, { 0x2D, trefiveByte_MACRO, "add" }, //SUB no imm8/16/32
 
-    { 0x2E, prefix_MACRO, "add" }, //prefix
-
-    { 0x2F, oneByte_MACRO, "add"}, //DAS (DAA for subtractions)
+        { 0x2E, prefix_MACRO, "add" }, //prefix
+       
+        { 0x2F, oneByte_MACRO, "add"}, //DAS (DAA for subtractions)
 
 	{ 0x30, twoByteModrm_MACRO, "add" }, { 0x31, twoByteModrm_MACRO, "add" }, { 0x32, twoByteModrm_MACRO, "add" }, { 0x33, twoByteModrm_MACRO, "add" },
 	{ 0x34, twoByte_MACRO, "add" }, { 0x35, trefiveByte_MACRO, "add" }, //XOR no imm8/16/32
@@ -390,7 +390,7 @@ const INSTRUCTION_TABLE deco[256] = {
 
 	{ 0x37, oneByte_MACRO, "add"}, //AAA (ascii adjust AL for addictions)
 
-    { 0x38, oneByte_MACRO, "add"}, { 0x39, oneByte_MACRO, "add"}, { 0x3A, oneByte_MACRO, "add"}, { 0x3B, oneByte_MACRO, "add"},
+        { 0x38, oneByte_MACRO, "add"}, { 0x39, oneByte_MACRO, "add"}, { 0x3A, oneByte_MACRO, "add"}, { 0x3B, oneByte_MACRO, "add"},
 	{ 0x3C, oneByte_MACRO, "add"}, { 0x3D, oneByte_MACRO, "add"}, //CMP
 
 	{ 0x3E, prefix_MACRO, "add" }, //prefix
@@ -401,7 +401,7 @@ const INSTRUCTION_TABLE deco[256] = {
 	{ 0x44, oneByte_MACRO, "add" }, { 0x45, oneByte_MACRO, "add" }, { 0x46, oneByte_MACRO, "add" }, { 0x47, oneByte_MACRO, "add" }, //INC
 
 	{ 0x48, disasmPush_MACRO, "add" }, { 0x49, oneByte_MACRO, "add" }, { 0x4A, oneByte_MACRO, "add" }, { 0x4B, oneByte_MACRO, "add" },
-    { 0x4C, oneByte_MACRO, "add" }, { 0x4D, oneByte_MACRO, "add" }, { 0x4E, oneByte_MACRO, "add" }, { 0x4F, oneByte_MACRO, "add" }, //DEC
+        { 0x4C, oneByte_MACRO, "add" }, { 0x4D, oneByte_MACRO, "add" }, { 0x4E, oneByte_MACRO, "add" }, { 0x4F, oneByte_MACRO, "add" }, //DEC
 
 	{ 0x50, disasmPush_MACRO, "push" }, { 0x51, disasmPush_MACRO, "push" }, { 0x52, disasmPush_MACRO, "push" }, { 0x53, disasmPush_MACRO, "push" }, 
 	{ 0x54, disasmPush_MACRO, "push" }, { 0x55, disasmPush_MACRO, "push" }, { 0x56, disasmPush_MACRO, "push" }, { 0x57, disasmPush_MACRO, "push" }, //PUSH r
@@ -409,7 +409,7 @@ const INSTRUCTION_TABLE deco[256] = {
 	{ 0x58, disasmPop_MACRO, "pop" }, { 0x59, oneByte_MACRO, "pop" }, { 0x5A, oneByte_MACRO, "pop" }, { 0x5B, oneByte_MACRO, "pop" },
 	{ 0x5C, disasmPop_MACRO, "pop" }, { 0x5D, disasmPop_MACRO, "pop" }, { 0x5E, disasmPop_MACRO, "pop" }, { 0x5F, disasmPop_MACRO, "pop" }, //POP r
 
-    { 0x60, oneByte_MACRO, "pushad" }, { 0x61, oneByte_MACRO, "popad" }, //PUSHAD, POPAD (pushano e poppano i general registers nello e dallo stack)
+        { 0x60, oneByte_MACRO, "pushad" }, { 0x61, oneByte_MACRO, "popad" }, //PUSHAD, POPAD (pushano e poppano i general registers nello e dallo stack)
 
 	{ 0x62, oneByte_MACRO, "add" }, //??
 	{ 0x63, oneByte_MACRO, "add" }, //??
@@ -421,9 +421,9 @@ const INSTRUCTION_TABLE deco[256] = {
 
 	{ 0x69, oneByte_MACRO, "add" }, //??
 
-    { 0x6A, twoByte_MACRO, "add" }, //PUSH imm8
+        { 0x6A, twoByte_MACRO, "add" }, //PUSH imm8
 
-    { 0x6B, oneByte_MACRO, "add" }, //??
+        { 0x6B, oneByte_MACRO, "add" }, //??
 
 	{ 0x6C, oneByte_MACRO, "add" }, { 0x6D, oneByte_MACRO, "add" }, { 0x6E, oneByte_MACRO, "add" }, { 0x6F, oneByte_MACRO, "add" }, //INS, OUTS
 
@@ -431,8 +431,8 @@ const INSTRUCTION_TABLE deco[256] = {
 	{ 0x71, oneByte_MACRO, "add" },
 	{ 0x72, oneByte_MACRO, "add" },
 	{ 0x73, oneByte_MACRO, "add" },
-    { 0x74, oneByte_MACRO, "add" },
-    { 0x75, oneByte_MACRO, "add" },
+        { 0x74, oneByte_MACRO, "add" },
+        { 0x75, oneByte_MACRO, "add" },
 	{ 0x76, oneByte_MACRO, "add" },
 	{ 0x77, oneByte_MACRO, "add" },
 	{ 0x78, twoByteModrm_MACRO, "add" },     
@@ -441,8 +441,8 @@ const INSTRUCTION_TABLE deco[256] = {
 	{ 0x7B, oneByte_MACRO, "add" },
 	{ 0x7C, oneByte_MACRO, "add" },
 	{ 0x7D, oneByte_MACRO, "add" },
-    { 0x7E, oneByte_MACRO, "add" },
-    { 0x7F, oneByte_MACRO, "add" },
+        { 0x7E, oneByte_MACRO, "add" },
+        { 0x7F, oneByte_MACRO, "add" },
 
 	{ 0x80, oneByte_MACRO, "add" },  //??
 	{ 0x81, oneByte_MACRO, "add" },  //??
@@ -455,7 +455,7 @@ const INSTRUCTION_TABLE deco[256] = {
 
 	{ 0x86, twoByteModrm_MACRO, "add" }, { 0x87, twoByteModrm_MACRO, "add" }, //XCHG r, r/m
 
-    { 0x88, twoByteModrm_MACRO, "mov" }, { 0x89, movInMem_MACRO, "mov" }, { 0x8A, movInMem_MACRO, "mov" }, { 0x8B, movNotInMem_MACRO, "mov" },
+        { 0x88, twoByteModrm_MACRO, "mov" }, { 0x89, movInMem_MACRO, "mov" }, { 0x8A, movInMem_MACRO, "mov" }, { 0x8B, movNotInMem_MACRO, "mov" },
 	{ 0x8C, twoByteModrm_MACRO, "mov" },    // MOV r, r/m etc.., 
 
 	{ 0x8D, twoByteModrm_MACRO, "add" }, { 0x8E, twoByteModrm_MACRO, "add" }, { 0x8F, twoByteModrm_MACRO, "add" }, //LEA, MOV sRegister, r/m, POP
@@ -471,7 +471,7 @@ const INSTRUCTION_TABLE deco[256] = {
 
 	{ 0x9B, oneByte_MACRO, "wait" }, //WAIT
 
-    { 0x9C, oneByte_MACRO, "push fs" }, { 0x9D, oneByte_MACRO, "pop fd" }, { 0x9E, oneByte_MACRO, "sahf" }, { 0x9F, oneByte_MACRO, "lahf" }, //PUSHFS, POPFD, SAHF, LAHF
+        { 0x9C, oneByte_MACRO, "push fs" }, { 0x9D, oneByte_MACRO, "pop fd" }, { 0x9E, oneByte_MACRO, "sahf" }, { 0x9F, oneByte_MACRO, "lahf" }, //PUSHFS, POPFD, SAHF, LAHF
 	//SAHF, LAHF settano da AH alcuni flag dell'EFLAGS, PUSHFD, POPFD pushano nello stack l'EFLAG
 
 	{ 0xA0, oneByte_MACRO, "add" },
@@ -481,14 +481,14 @@ const INSTRUCTION_TABLE deco[256] = {
 
 	{ 0xA4, oneByte_MACRO, "add" }, { 0xA5, oneByte_MACRO, "add" }, //MOVS, MOVSD  mov ES:(E)DI, DS:(E)SI
 
-    { 0xA6, oneByte_MACRO, "add" }, { 0xA7, oneByte_MACRO, "add" }, //CMP
+        { 0xA6, oneByte_MACRO, "add" }, { 0xA7, oneByte_MACRO, "add" }, //CMP
 	
 	{ 0xA8, twoByte_MACRO, "add" }, { 0xA9, trefiveByte_MACRO, "add" }, //TEST
 
 	{ 0xAA, oneByte_MACRO, "stos" }, { 0xAB, oneByte_MACRO, "stos" }, { 0xAC, oneByte_MACRO, "stos" }, { 0xAD, oneByte_MACRO, "stos" },
 	{ 0xAE, oneByte_MACRO, "stos" }, { 0xAF, oneByte_MACRO, "stos" }, //STOS, LODS, SCAS salvano in ES:(E)DI da AX, etc..
 
-    { 0xB0, twoByte_MACRO, "mov" }, { 0xB1, twoByte_MACRO, "mov" }, { 0xB2, twoByte_MACRO, "mov" }, { 0xB3, twoByte_MACRO, "mov" },
+        { 0xB0, twoByte_MACRO, "mov" }, { 0xB1, twoByte_MACRO, "mov" }, { 0xB2, twoByte_MACRO, "mov" }, { 0xB3, twoByte_MACRO, "mov" },
 	{ 0xB4, twoByte_MACRO, "mov" }, { 0xB5, twoByte_MACRO, "mov" }, { 0xB6, twoByte_MACRO, "mov" }, { 0xB7, twoByte_MACRO, "mov" }, //MOV r, r/m etc...
 
 	{ 0xB8, trefiveByte_MACRO, "add" }, { 0xB9, trefiveByte_MACRO, "add" }, { 0xBA, trefiveByte_MACRO, "add" }, { 0xBB, trefiveByte_MACRO, "add" },
@@ -518,15 +518,15 @@ const INSTRUCTION_TABLE deco[256] = {
 	{ 0xD1, oneByte_MACRO, "add" },  
 	{ 0xD2, trefiveByte_MACRO, "add" },        
 	{ 0xD3, trefiveByte_MACRO, "add" }, 
-    { 0xD4, trefiveByte_MACRO, "add" },
+        { 0xD4, trefiveByte_MACRO, "add" },
 	{ 0xD5, trefiveByte_MACRO, "add" }, 
 	{ 0xD6, trefiveByte_MACRO, "add" },        
 	{ 0xD7, trefiveByte_MACRO, "add" }, 
-    { 0xD8, trefiveByte_MACRO, "add" },
+        { 0xD8, trefiveByte_MACRO, "add" },
 	{ 0xD9, trefiveByte_MACRO, "add" },
 	{ 0xDA, trefiveByte_MACRO, "add" },        
 	{ 0xDB, trefiveByte_MACRO, "add" }, 
-    { 0xDC, trefiveByte_MACRO, "add" },
+        { 0xDC, trefiveByte_MACRO, "add" },
 	{ 0xDD, trefiveByte_MACRO, "add" },
 	{ 0xDE, trefiveByte_MACRO, "add" },
 	{ 0xDF, trefiveByte_MACRO, "add" },
@@ -540,7 +540,7 @@ const INSTRUCTION_TABLE deco[256] = {
 	{ 0xE6, trefiveByte_MACRO, "mov" },       
 	{ 0xE7, trefiveByte_MACRO, "mov" }, 
 
-    { 0xE8, disasmCall_MARCO, "call" },  //call cd
+        { 0xE8, disasmCall_MARCO, "call" },  //call cd
 
 	{ 0xE9, trefiveByte_MACRO, "jmp" }, 
 	{ 0xEA, trefiveByte_MACRO, "mxx" },
@@ -556,11 +556,11 @@ const INSTRUCTION_TABLE deco[256] = {
 
 	{ 0xF1, trefiveByte_MACRO, "add" }, 
 
-    { 0xF2, prefix_MACRO, "add" }, { 0xF3, prefix_MACRO, "add" }, //prefix REPNE, REPE
+        { 0xF2, prefix_MACRO, "add" }, { 0xF3, prefix_MACRO, "add" }, //prefix REPNE, REPE
 
 	{ 0xF4, trefiveByte_MACRO, "add" },        
 	{ 0xF5, trefiveByte_MACRO, "add" }, 
-    { 0xF6, trefiveByte_MACRO, "add" },
+        { 0xF6, trefiveByte_MACRO, "add" },
 	{ 0xF7, trefiveByte_MACRO, "add" },
 	{ 0xF8, trefiveByte_MACRO, "add" },
 	{ 0xF9, trefiveByte_MACRO, "add" },
